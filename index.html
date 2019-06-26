@@ -1,0 +1,1499 @@
+<!doctype html>
+<html>
+<head>
+   <title> Site Assessment for Renewable Energy sources </title>
+   <!-- CSS FIles -->
+   <link rel="icon" href="static/Images/favicon.png">
+   <link rel="stylesheet" href="static/CSS/bootstrap.min.css">
+   <link rel="stylesheet" href="static/CSS/w3.css">
+   <link rel="stylesheet" href="static/CSS/leaflet.css" />
+   <link rel="stylesheet" href="static/CSS/easy-button.css">
+   <link rel="stylesheet" href="static/CSS/leaflet.groupedlayercontrol.css">
+   <style>
+      .topnav-header {
+         overflow: hidden;
+         background-color: #333;
+         height: 70px
+      }
+      .topnav {
+         overflow: hidden;
+         background-color: #333;
+         height: 50px
+      }
+      .topnav a {
+         float: left;
+         color: #f2f2f2;
+         text-align: center;
+         padding: 14px 16px;
+         text-decoration: none;
+         font-size: 17px;
+         width: 228px;
+      }
+      .topnav a:hover {
+         background-color: #ddd;
+         color: black;
+         cursor: pointer;
+      }
+      .topnav a.active {
+         background-color: #4CAF50;
+         color: white;
+      }
+      body {
+         width: 100%;
+         height: 100%;
+         background-position: center;
+         background-image: url("static/Images/Background.png");
+         background-repeat: no-repeat;
+         background-size: 100% 200vh;
+         /* http://www.babyjacksbbq.com/wp-content/uploads/2016/11/autumn-leaves-background-light.png */
+      }
+      a.link{
+         text-decoration:underline;
+         cursor: pointer;
+      }
+      /* Coordinates */
+      .leaflet-container .leaflet-control-mouseposition {
+         background-color: rgba(255, 255, 255, 0.7);
+         box-shadow: 0 0 5px #bbb;
+         margin: 7.5px;
+         color: #333;
+         font: 11px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+      }
+      /* Toggle layers button */
+      .leaflet-touch .leaflet-control-layers-toggle {
+         width:32px  !important;
+         height: 35px;
+         background-image: url("static/Images/layers.png")
+      }
+      /* Leaflet layers for Findings page */
+      .leaflet-touch .leaflet-control-layers-list {
+         height:267px !important;
+      }
+      /* Legend for Geothemal */
+      .legend {
+         background: #F0F0F0;
+         border-radius: 5px;
+         width: 110px;
+         padding: 10px;
+         line-height: 18px;
+         color: black;
+      }
+      .legend i {
+         width: 18px;
+         height: 18px;
+         float: left;
+         margin-right: 8px;
+         opacity: 0.7;
+      }
+      /* Findings Legend */
+      .f_legend {
+         background: #F0F0F0;
+         border-radius: 5px;
+         width: 140px;
+         padding: 10px;
+         line-height: 18px;
+         color: black;
+      }
+   </style>
+</head>
+<body>
+   <!-- Javascript files -->
+   <script src="static/JS/jquery-3.3.1.js"> </script> <!-- Jquery for easy web interaction -->
+   <script src="static/JS/popper.min.js"> </script> <!-- Requirement of Bootstrap -->
+   <script src="static/JS/bootstrap.min.js"> </script> <!-- Bootstrap -->
+   <script src="static/JS/plotly-latest.min.js"> </script> <!-- Plotly for charts -->
+   <script src="static/JS/leaflet.js"> </script> <!-- Leaflet -->
+   <script src="static/JS/easy-button.js"> </script> <!-- Default map view -->
+   <script src="static/JS/leaflet-bing-layer.js"> </script> <!-- Bing map load -->
+   <script src="static/JS/leaflet.groupedlayercontrol.js"> </script> <!-- Grouped Layers -->
+   <script src="static/JS/leaflet.coordinates.js"> </script> <!-- Coordinates-->
+   <script src="static/JS/Layers.js"> </script> <!-- GeoJSON layers -->
+
+   <div class="container" style="align:center; padding-top:1px">
+      <div class="topnav-header" id="heading">
+        <h1 style="color:white; text-align:center"> Site Assessment for Renewable Energy </h1>
+      </div>
+      <!-- https://www.freewebheaders.com/wordpress/wp-content/gallery/forests-fields/nature-grass-meadow-and-clouds-website-header.jpg -->
+      <img id="header-image" src="static/Images/Header.png" width=100% height=290vh>
+      <div class="topnav">
+         <a id="AHome" onclick="Home()"> Home </a>
+         <a id="ATeam" onclick="Team()"> Team - Group6 </a>
+         <a id="ADatasets" onclick="Datasets()"> Datasets </a>
+         <a id="AAnalysis" onclick="Analysis()"> Analysis </a>
+         <a id="AFindings" onclick="Findings()"> Findings </a>
+      </div>
+      <div id="Content"> </div>
+      <div id="Home" hidden>
+         Renewable energy is derived from natural processes that are replenished
+         at a rate that is equal or faster than the rate at which they are
+         consumed. There are various forms of renewable energy, deriving directly
+         or indirectly from the sun, or from heat generated deep within the earth.
+         They include energy generated from solar, wind, biomass, geothermal,
+         hydropower and ocean resources, solid biomass, biogas and liquid biofuels.
+         <!-- Renewable energy source map -->
+         <div class="modal fade" id="rene-modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document" id="modal-video">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Natural Resources Canada</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/CanadaResourceMap.png"
+                          width=570
+                          height=450 />
+                  </div>
+               </div>
+            </div>
+         </div>
+         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rene-modal" style="width:10px; height:10px" title="Show Resource utilisation">
+         </button>
+         <a class="link"
+            href="https://www.nrcan.gc.ca/energy/facts/renewable-energy/20069"
+            target="_blank"
+            style="color:blue">
+         (More)</a>
+         <br><br> <b> Theme of the project? </b> <br>
+         Assessment of Renewable energy sources in New Brunswick and Tidal stations impact on Marine life <br>
+         How GIS can help us understand (more!) about these sources <br><br>
+         <div style="float:left">
+            <div id="study-area" style="width:330px;height:310px"> </div>
+         </div>
+         <div style="width:385px;float:right">
+            <!-- <div id="energy-chart" style="width:385px;border:1px solid black;"> </div> -->
+            <div style="background:#FFFFF0; text-align:left; padding-left:10px; padding-right:10px">
+               <br><b>Thought on this website design:</b><br>
+               This project website is a single <a class="link" href="https://en.wikipedia.org/wiki/HTML" target="blank">HTML</a>
+               page with each tab representing different
+               <a class="link" href="https://www.w3schools.com/tags/tag_div.asp" target="_blank">divs</a>.
+               Thanks to <a class="link" href="https://jquery.com/" target="_blank">Jquery</a>
+               which does this amazing job and also many functionalities in the background.
+               Artistic look of most the HTML components is achived through
+               <a class="link" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>.
+               Cheers to <a class="link" href="https://leafletjs.com/" target="_blank">Leaflet</a>
+               for all the <a class="link" href="https://www.gislounge.com/whats-in-a-map/" target="_blank">Map
+               components</a> and <a class="link" href="http://geojson.org/" target="_blank">GeoJSON</a>
+               layer functionalities. <a class="link" href="https://plot.ly/javascript/" target="_blank">Plotly</a>
+               helped a lot in creating dynamic Interactive charts at the
+               <a class="link" href="https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)" target="_blank">runtime</a>.
+               <br><br>(*<a class="link" href="https://www.w3schools.com/tags/tag_a.asp">underlined</a> text are links)<br><br>
+            </div>
+         </div>
+         <div style="padding-left:350px;width:100px">
+            <div id="population-chart" style="width:385px;border:1px solid black;"> </div>
+         </div>
+         <br>
+         <!-- <img src="https://www.worldatlas.com/webimage/countrys/namerica/province/lgcolor/nbcolor.gif" width=330 height=300> -->
+      </div>
+      <div id="Team" hidden>
+         <br>
+         <div style="float:left; padding-left:150px">
+            <div class="w3-panel w3-card-4" style="width:140%; height:225px; text-align:center">
+               <div class="card" style="padding-top:7px">
+                   <img class="card-img-top" src="static/Images/Team_Images/Maxwell.jpg" style="width:100px">
+                   <div class="card-body">
+                     <h4 class="card-title"><b> Maxwell Kamba</b></h4>
+                     <p class="card-text"> Solar Energy </p>
+                     <a class="link" href="https://www.facebook.com/maxwell.kamba.7" target="_blank">
+                        <img src="static/Images/Icons/Facebook.jpg"
+                             width=17></a>
+                   </div>
+               </div>
+             </div>
+             <div class="w3-panel w3-card-4" style="width:140%; height:225px; text-align:center">
+                <div class="card" style="padding-top:7px">
+                    <img class="card-img-top" src="static/Images/Team_Images/Morteza.jpg" style="width:100px">
+                    <div class="card-body">
+                      <h4 class="card-title"><b> Morteza Esfandiari</b></h4>
+                      <p class="card-text"> Geothermal Energy </p>
+                      <a class="link" href="https://www.facebook.com/morteza.esfandiari.8" target="_blank">
+                        <img src="static/Images/Icons/Facebook.jpg"
+                             width=17></a>
+                    </div>
+                </div>
+              </div>
+           </div>
+           <div style="float:right; padding-right:210px">
+              <div class="w3-panel w3-card-4" style="width:120%;height:225px; text-align:center">
+                 <div class="card" style="padding-top:7px">
+                     <img class="card-img-top" src="static/Images/Team_Images/Ronak.jpg" style="width:100px">
+                     <div class="card-body">
+                       <h4 class="card-title"><b> Ronak Vadalani</b></h4>
+                       <p class="card-text"> Tidal Energy </p>
+                       <a class="link" href="" target="_blank">
+                          <img src="static/Images/Icons/Facebook.jpg"
+                               width=17></a>
+                     </div>
+                 </div>
+              </div>
+              <div class="w3-panel w3-card-4" style="width:120%;height:225px; text-align:center">
+                <div class="card" style="padding-top:7px">
+                    <img class="card-img-top" src="static/Images/Team_Images/Vaasu.jpg" alt="Card image" style="width:100px">
+                    <div class="card-body">
+                      <h4 class="card-title"><b> Vaasudevan Srinivasan</b></h4>
+                      <p class="card-text">Python & Web Development </p>
+                      <a class="link" href="https://github.com/vaasudevans" target="_blank">
+                        <img src="static/Images/Icons/Github.png"
+                             width=20>
+                     </a>
+                    </div>
+                </div>
+              </div>
+           </div>
+      </div>
+      <div id="Datasets" hidden> <br>
+         <table class="table table-hover" style="background:#FFFFF0">
+            <thead class="thead-light">
+               <tr>
+                  <th scope="col"> # </th>
+                  <th scope="col"> Category </th>
+                  <th scope="col"> Links </th>
+                  <th scope="col"> Description </th>
+                  <th scope="col"> Format </th>
+               </tr>
+            </thead>
+            <tr>
+               <th scope="row">1</th>
+               <td> Solar </td>
+               <td>
+                  <a class="link"
+                     title="https://www.nrcan.gc.ca/18366#menu-energy"
+                     href="https://www.nrcan.gc.ca/18366#menu-energy" target="_blank">
+                     Photovoltaic potential and insolation dataset</a>
+               </td> <!-- https://solarpanelpower.ca/solar-power-maps-canada/ -->
+               <td>
+                  Estimates of the electricity that can be generated by photovoltaic arrays (NRCan)
+               </td>
+               <td>
+                  .CSV
+               </td>
+            </tr>
+            <tr>
+               <th scope="row">2</th>
+               <td> Geothermal </td>
+               <td>
+                  * <a class="link"
+                       title="https://www.nrcan.gc.ca/energy/funding/current-funding-programs/eii/17114"
+                       href="https://www.nrcan.gc.ca/energy/funding/current-funding-programs/eii/17114" target="_blank">
+                     Geothermal Map of Canada</a> <br>
+                  * <a class="link"
+                       title="http://geonb.snb.ca/downloads/drillhole/geonb_drillhole-troudeforage_shp.zip"
+                       href="http://geonb.snb.ca/downloads/drillhole/geonb_drillhole-troudeforage_shp.zip" target="_blank">
+                     Drill hole Dataset</a> <br>
+               </td>
+               <td>
+                  <ul style="padding-left:17px">
+                     <li>Georeferenced the available Geothermal map (NRCan)<b</li>
+                     <li>Already drilled places in New Brunswick (GeoNB)</li>
+                  </ul>
+               </td>
+               <td>
+                  .JPG<br>SHP
+               </td>
+            </tr>
+            <tr>
+               <th scope="row">3</th>
+               <td> Tidal </td>
+               <td>
+                  * <a class="link"
+                       title="http://www.waterlevels.gc.ca/eng/data"
+                       href="http://www.waterlevels.gc.ca/eng/data" target="_blank">
+                     Tidal Height in St. John Harbour</a> <br>
+                  * <a class="link"
+                       title="http://tides.gc.ca/eng/station?sid=1"
+                       href="http://tides.gc.ca/eng/station?sid=1" target="_blank">
+                       Tidal Height in Observatories</a> <br>
+                  * <a class="link"
+                       title="https://mapcruzin.com/free-canada-new-brunswick-arcgis-maps-shapefiles.htm"
+                       href="https://mapcruzin.com/free-canada-new-brunswick-arcgis-maps-shapefiles.htm" target="_blank">
+                     CoastalMap</a>
+               </td>
+               <td>
+                  <ul style="padding-left:17px">
+                     <li>
+                        Developed <a class="link"
+                                       title="Harbor python script"
+                                       href="https://github.com/VaasuDevanS/Renewable-Site-Assesment/blob/master/Python/Scarp_StJohnHarbor.py"
+                                       target="_blank"> Harbor</a>
+                        and <a class="link"
+                               title="Observatories python script"
+                               href="https://github.com/VaasuDevanS/Renewable-Site-Assesment/blob/master/Python/Scrap_Observatories.py"
+                               target="_blank"> Observatories</a>
+                        <a class="link"
+                               title="https://www.python.org/"
+                               href="https://www.python.org/" target="_blank">
+                           Python</a> script <br>for web-scraping and computing statistics from tidal heights
+                     </li>
+                     <li>
+                        Represents all the coastal-line in New Brunswick
+                     </li>
+               </td>
+               <td>
+                  .CSV<br>.SHP
+               </td>
+            </tr>
+            <tr>
+               <th scope="row">4</th>
+               <td> Counties </td>
+               <td>
+                  * <a class="link"
+                     title="http://www.diva-gis.org/gdata"
+                     href="http://www.diva-gis.org/gdata" target="_blank">
+                     DIVA GIS datasets</a> <br>
+                  * <a class="link"
+                       title=""
+                       href="" target="_blank">
+                     New Brunswick Road Network</a>
+               </td>
+               <td>
+                  <ul style="padding-left:17px">
+                     <li>Extracted New Brunswick features from Administative lands</li>
+                     <li>Used Arterial, Express, Collector and Freeway Road layers</li>
+                  </ul>
+               </td>
+               <td>
+                  .SHP<br>.SHP
+               </td>
+            </tr>
+            <tr>
+               <th scope="row">5</th>
+               <td> Population </td>
+               <td>
+                  * <a class="link"
+                       title="https://www.citypopulation.de/php/canada-newbrunswick-admin.php"
+                       href="https://www.citypopulation.de/php/canada-newbrunswick-admin.php" target="_blank">
+                     Population Statistics (1996-2016)</a> <br>
+               </td>
+               <td>
+                  Updated the statistical values in the Attribute table of county Shp
+               </td>
+               <td>
+                  .SHP
+               </td>
+            </tr>
+         </table>
+         (*<a class="link" href="https://www.w3schools.com/tags/tag_a.asp">Underlined</a> text in this tab are links) <br>
+      </div>
+      <div id="Analysis" hidden>
+         <!-- Solar Model Builder -->
+         <div class="modal fade" id="solar-modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Solar Model Builder</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/Analysis/Solar/Model.jpg"
+                          width=570
+                          height=450 /> <br><br>
+                     <div style="text-align:justify">
+                        ModelBuilder for ArcGIS was used to create, edit and manage spatial data for
+                        potential sites for solar energy and New Brunswick Polygon. The model strings
+                        together sequence of the following geo-processing tools; Inverse Distance Weighting
+                        (IDW) and Extract by Mask tools that support in assessing of potential sites for solar
+                        energy. The sequence feeds the output of IDW into Extract by Mask as input. It shows the
+                        processing workflow for solar energy assessment in New Brunswick.
+                     </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Geothermal Model Builder -->
+         <div class="modal fade" id="geo-modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Geothermal Model Builder</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/Analysis/Geothermal/Model.jpg"
+                          width=570
+                          height=450 />
+                     <div style="text-align:justify">
+                          This model builder creates a buffer around the cities with the
+                          population of more than 50,000. Then, it selects the drill holes which
+                          are within the created buffers, and more than 300m deep.
+                     </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Tidal Model Builder -->
+         <div class="modal fade" id="tidal-modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Tidal Model Builder</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/Analysis/Tidal/TModel.png"
+                          width=570
+                          height=450 />
+                    <div style="text-align:justify"> <br>
+                        This model builder uses Tidal Observatories, Ecozones, Parks
+                        and existing power stations. Model builder extracts points having
+                        tidal height > 7m. Then buffer of 1km for eco-zones will be created
+                        and symmetric difference of these buffers and points will be sent out
+                        of the model.
+                   </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Solar Analysis -->
+         <div class="modal fade" id="solar-analysis" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document" style="width:1000px">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Solar Analysis</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                       <!-- Carousel -->
+                       <div id="SolarCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-pause="hover">
+                          <ol class="carousel-indicators">
+                              <li data-target="#SolarCarousel" data-slide-to="0" class="active" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="1" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="2" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="3" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="4" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="5" style="background:black;"></li>
+                              <li data-target="#SolarCarousel" data-slide-to="6" style="background:black;"></li>
+                          </ol>
+                         <div class="carousel-inner">
+                           <div class="item active">
+                             <img src="static/Images/Analysis/Solar/1.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>1. Open ArcMap 10.6.1
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/2.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>2. Add Average Potential Photovoltaic and NB shapefile
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/3.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>3. Run Inverse Distance Weighted (IDW)
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/4.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>4. Clip IDW Raster with NB Boundary
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/5.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>5. Change Symbology
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/6.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>6. Create Layout
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Solar/7.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>7. Final Layout
+                             </div>
+                           </div>
+                         </div>
+                         <button class="left carousel-control" href="#SolarCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="prev">
+                           <span style="font-size:2.5em; padding-top:-100px">&larr;</span>
+                         </a>
+                         <button class="right carousel-control" href="#SolarCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="next">
+                           <span style="font-size:2.5em; align:center">&rarr;</span>
+                         </a>
+                       </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                     Click (Arrows | Dots) accordingly to view the (Next | Previous) image<br>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div> <!-- Modal content -->
+            </div>
+         </div>
+         <!-- Geothermal Analysis -->
+         <div class="modal fade" id="geo-analysis" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document" style="width:1000px">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Geothermal Analysis</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                       <!-- Carousel -->
+                       <div id="GeoCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-pause="hover">
+                          <ol class="carousel-indicators">
+                              <li data-target="#GeoCarousel" data-slide-to="0" class="active" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="1" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="2" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="3" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="4" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="5" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="6" style="background:black;"></li>
+                              <li data-target="#GeoCarousel" data-slide-to="7" style="background:black;"></li>
+                          </ol>
+                         <div class="carousel-inner">
+                           <div class="item active">
+                             <img src="static/Images/Analysis/Geothermal/1-Georeferencing and digitizing polygons.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>1. Georeferencing and Digitizing the polygons
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/2-Draw polygons and adding the tempratures.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>2. Creating polygon features and add the temperatures
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/3-Geothermal potential polygons.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>3. Styling based on temperatures
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/4-Selecting cities with population more than 50000.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>4. Selecting cities with population more than 50k
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/5-Creating buffer around selected cities with 30 km radius.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>5. Buffer of 30 km for the cities
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/6-Adding Drill Holes from GeoNB.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>6. Adding Drill-Hole dataset
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/7-Selecting Drill Holes within the created buffers.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>7. Intersection of Drill holes and buffers
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Geothermal/8-Selecting the Holes deeper than 300m.jpg" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>8. Select by Attributes - "Hole > 300m"
+                             </div>
+                           </div>
+                         </div>
+                         <button class="left carousel-control" href="#GeoCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="prev">
+                           <span style="font-size:2.5em; padding-top:-100px">&larr;</span>
+                         </a>
+                         <button class="right carousel-control" href="#GeoCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="next">
+                           <span style="font-size:2.5em; align:center">&rarr;</span>
+                         </a>
+                       </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                     Click (Arrows | Dots) accordingly to view the (Next | Previous) image<br>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div> <!-- Modal content -->
+            </div>
+         </div>
+         <!-- Tidal Analysis -->
+         <div class="modal fade" id="tidal-analysis" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document" style="width:1000px">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Tidal Analysis</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                       <!-- Carousel -->
+                       <div id="TidalCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-pause="hover">
+                          <ol class="carousel-indicators">
+                              <li data-target="#TidalCarousel" data-slide-to="0" class="active" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="1" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="2" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="3" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="4" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="5" style="background:black;"></li>
+                              <li data-target="#TidalCarousel" data-slide-to="6" style="background:black;"></li>
+                          </ol>
+                         <div class="carousel-inner">
+                           <div class="item active">
+                             <img src="static/Images/Analysis/Tidal/1.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>1. Tidal Observatories
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/2.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>2. Green points indicate sites with "Tidal Height>7m" (Select by Attribute)
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/3.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>3. Georeferencing Fundy Aquarium Zone
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/4.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>4. Intersection of Coastal and Marine Zone
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/5.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>5. Green polygons representing Eco-zones and existing power stations
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/6.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>6. Select by Location (within 1km) - Tidal Observatories and EcoZone polygons
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Analysis/Tidal/7.png" style="width:100%;">
+                             <div style="text-align:center">
+                                <br>7. Switch Selection to get the Potential Tidal site points
+                             </div>
+                           </div>
+                         </div>
+                         <button class="left carousel-control" href="#TidalCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="prev">
+                           <span style="font-size:2.5em; padding-top:-100px">&larr;</span>
+                         </a>
+                         <button class="right carousel-control" href="#TidalCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="next">
+                           <span style="font-size:2.5em; align:center">&rarr;</span>
+                         </a>
+                       </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                     Click (Arrows | Dots) accordingly to view the (Next | Previous) image<br>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div> <!-- Modal content -->
+            </div>
+         </div>
+         <!-- Actual Accordion code for Analysis -->
+         <div class="panel-group" id="accordion" style="padding-top:3px">
+            <div class="panel panel-default">
+               <a data-toggle="collapse" data-parent="#accordion" href="#collapse1" style="text-decoration:none">
+                  <div class="panel-heading" style="background-color:#F0F0F0">
+                     <h4 class="panel-title" style="text-align:center">
+                        Solar (Photovoltaic-PV) Energy
+                     </h4>
+                  </div>
+               </a>
+               <div id="collapse1" class="panel-collapse collapse in"> <!-- in -->
+                  <div class="panel-body">
+                     <!-- Maxwell's work -->
+                     <div>
+                        <div id="solar-map" style="width:49%; height:60vh; float:left"> </div>
+                        <div style="float:right; width:550px; text-align:justify">
+                           Solar energy is a form of renewable energy which comes from the sun. In Canada,
+                           Photovoltaic (PV) technology has become a favoured form of renewable energy
+                           technology due to a number of social and economic factors, including the
+                           need to reduce greenhouse gas (GHG) emissions, deregulation and the restructuring of
+                           electric power generating companies. The rapid growth in the deployment of PV
+                           in recent years indicates that the technology is quickly gaining ground in Canada.
+                           They can be placed on a home, cottage, camper trailer and in many other places.
+                           This technology is a good option for those who own camps or cottages in remote areas
+                           where you are not connected to the power grid. This can also aid in reducing the
+                           amount of energy that you must purchase if you are connected to the electricity grid.
+                           Municipality database of photovoltaic (PV) potential and insolation provides
+                           estimates of the electricity that can be generated by photovoltaic arrays (in kWh/kW)
+                           for over 3500 municipalities in Canada.
+                           <br><br>
+
+                           <div style="float:left;text-align:center">
+                              <img src="static/Images/ArcMap.png"
+                                   data-toggle="modal"
+                                   data-target="#solar-analysis"
+                                   title="Analysis Screenshots"
+                                   width=80
+                                   height=80
+                                   style="cursor:pointer"> <br>
+                              ArcMap Screenshots
+                           </div>
+                           <div style="float:right; padding-right:112px;text-align:center">
+                              <a class="link" href="static/KMZ/Analysis/Solar_Raster.kmz" download>
+                                 <img src="static/Images/kml.png" width=60 height=80></a>
+                              <br>Download
+                           </div>
+                           <div style="padding-left:210px;width:200px; text-align:center;">
+                              <img src="static/Images/Analysis/Solar/Model.jpg"
+                                   data-toggle="modal"
+                                   data-target="#solar-modal"
+                                   title="Show Model Builder"
+                                   width=80
+                                   height=80
+                                   style="cursor:pointer"> <br>
+                              &nbsp;&nbsp;&nbsp;&nbsp;Model
+                           </div>
+                           <br><br><- click on the polygons to view the PV potential<br>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="panel panel-default">
+               <a data-toggle="collapse" data-parent="#accordion" href="#collapse2" style="text-decoration:none">
+                  <div class="panel-heading" style="background-color:#F0F0F0">
+                     <h4 class="panel-title" style="text-align:center">
+                        Geothermal Energy
+                     </h4>
+                  </div>
+               </a>
+               <div id="collapse2" class="panel-collapse collapse">
+                  <div class="panel-body">
+                     <!-- Morteza's work -->
+                     <div>
+                        <div id="geothermal-map" style="width:52%; height:60vh; float:left"> </div>
+                        <div style="float:right; width:520px; text-align:justify">
+                           For the Geothermal part, our project considers factors like, Accessibility,
+                           Market, Drill holes and the Geothermal potential. The Geothermal potential has been
+                           considered at the depth of 7km since at present, geothermal wells are rarely more
+                           than 3 km deep. Upper estimates of geothermal resources assume wells as
+                           deep as 10 km. As for market factor, we have considered the population of
+                           different cities across New Brunswick. The cities with the population of
+                           higher than 30,000 have been selected as suitable places for constructing
+                           a geothermal power generation stations. The accessibility layer represents some
+                           of the main roads across New Brunswick. The purpose of considering this layer
+                           was due to being able to transport the power from the power generation stations
+                           to cities. The last layer, which are the drill holes, have been mentioned
+                           in order to make a rough suggestion for constructing a geothermal station,
+                           since the drilling has been done to some extent at this locations.<br><br>
+
+                           <div style="float:left;text-align:center">
+                              <img src="static/Images/ArcMap.png"
+                                   data-toggle="modal"
+                                   data-target="#geo-analysis"
+                                   title="Analysis Screenshots"
+                                   width=80
+                                   height=80
+                                   style="cursor:pointer"> <br>
+                              ArcMap Screenshots
+                           </div>
+                           <div style="float:right; padding-right:112px; text-align:center">
+                              <a class="link" href="static/KMZ/Analysis/Geothermal_Polygons.kmz" download>
+                                 <img src="static/Images/kml.png" width=60 height=80></a>
+                              <br>Download
+                           </div>
+                           <div style="padding-left:190px;width:200px; text-align:center;">
+                              <img src="static/Images/Analysis/Geothermal/Model.jpg"
+                                   data-toggle="modal"
+                                   data-target="#geo-modal"
+                                   title="Show Model Builder"
+                                   width=80
+                                   height=80
+                                   style="cursor:pointer"> <br>
+                              &nbsp;&nbsp;&nbsp;&nbsp;Model
+                           </div>
+                           <br><br><- click on the polygons to view thematic information
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="panel panel-default">
+               <a data-toggle="collapse" data-parent="#accordion" href="#collapse3" style="text-decoration:none">
+                  <div class="panel-heading" style="background-color:#F0F0F0">
+                     <h4 class="panel-title" style="text-align:center">
+                        Tidal Energy
+                     </h4>
+                  </div>
+               </a>
+               <div id="collapse3" class="panel-collapse collapse">
+                  <div class="panel-body">
+                     <!-- Ronak's work -->
+                     <div style="width:64%; height:40vh; float:left">
+                        <div id="tidal-chart" style="border:1px solid black;"> </div>
+                        Hover on the chart dots to view Tidal height
+                     </div>
+                     <div style="float:right; width:390px; text-align:left;">
+                        <div id="tidal-map" style="width:100%; height:40.5vh; float:left"> </div>
+                        Click orange circles to view recorded height
+                     </div>
+                     <div style="float:left; text-align:justify;">
+                        <br>
+                        Tidal energy is generated from power found in ocean tidal currents and the use of tidal height differences.
+                        Tidal range may vary over a wide range (4.5-12.4 m) from site to site. A tidal range of <b>at least 7m</b> is
+                        required for economical operation and for sufficient head of water for the turbines.
+                        Tidal energy can be exploited either by building semi-permeable barrages across estuaries with a high
+                        tidal range or by harnessing offshore tidal streams. This project also considers
+                        <a class="link"
+                                 href="http://bayoffundytourism.com/fundy_aquarium_ecozone_map.pdf"
+                                 target="_blank">Fundy Aquarium Ecozone</a> as a
+                        parameter and outputs sites which will not cause any damages to it.<br>
+                        <div style="float:left;text-align:center">
+                           <img src="static/Images/ArcMap.png"
+                                data-toggle="modal"
+                                data-target="#tidal-analysis"
+                                title="Analysis Screenshots"
+                                width=80
+                                height=80
+                                style="cursor:pointer"> <br>
+                           ArcMap Screenshots
+                        </div>
+                        <div style="float:right; padding-right:700px;text-align:center">
+                           <a class="link" href="static/KMZ/Analysis/Tidal_Buffers.kmz" download>
+                              <img src="static/Images/kml.png" width=60 height=80></a>
+                           <br> Download
+                        </div>
+                        <div style="padding-left:190px;width:200px; text-align:center;">
+                           <img src="static/Images/Analysis/Tidal/TModel.png"
+                                data-toggle="modal"
+                                data-target="#tidal-modal"
+                                title="Show Model Builder"
+                                width=80
+                                height=80
+                                style="cursor:pointer"> <br>
+                           &nbsp;&nbsp;&nbsp;Model
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- <div class="panel panel-default">
+               <a data-toggle="collapse" data-parent="#accordion" href="#collapse4" style="text-decoration:none">
+                  <div class="panel-heading" style="background-color:#F0F0F0">
+                     <h4 class="panel-title" style="text-align:center">
+                        Biomass Energy
+                     </h4>
+                  </div>
+               </a>
+               <div id="collapse4" class="panel-collapse collapse">
+                  <div class="panel-body">
+                     Me :(
+                     <div id="biomass-map" style="width:60%; height:60vh; float:left"> </div>
+                     <div style="float:right; width:430px; text-align:left">
+                        Biomass analysis
+                     </div>
+                  </div>
+               </div>
+            </div> -->
+         </div>
+      </div>
+      <div id="Findings" hidden>
+         <!-- Solar Findings -->
+         <div class="modal fade" id="solar-findings" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Solar Energy stations</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/Findings/Solar/ppv_kWh_nb.jpg_.jpg"
+                          style="width:100%;height:70vh;">
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Geothermal Findings -->
+         <div class="modal fade" id="geo-findings" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Geothermal stations</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                       <!-- Carousel -->
+                       <div id="GeoFCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-pause="hover">
+                          <ol class="carousel-indicators">
+                              <li data-target="#GeoFCarousel" data-slide-to="0" class="active" style="background:black;"></li>
+                              <li data-target="#GeoFCarousel" data-slide-to="1" style="background:black;"></li>
+                          </ol>
+                         <div class="carousel-inner">
+                           <div class="item active">
+                             <img src="static/Images/Findings/Geothermal/Suggested Sites for Geothermal Stations - Fredericton-page-001.jpg"
+                                  style="width:100%;height:70vh;">
+                             <div style="text-align:center">
+                                <br>Suggested sites for Geothermal stations in Fredericton
+                             </div>
+                           </div>
+                           <div class="item">
+                             <img src="static/Images/Findings/Geothermal/Suggested Sites for Geothermal Stations - Saint John-page-001.jpg"
+                                  style="width:100%;height:70vh;">
+                             <div style="text-align:center">
+                                <br>Suggested sites for Geothermal stations in Saint John
+                             </div>
+                           </div>
+                         </div>
+                         <button class="left carousel-control" href="#GeoFCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="prev">
+                           <span style="font-size:2.5em; padding-top:-100px">&larr;</span>
+                         </a>
+                         <button class="right carousel-control" href="#GeoFCarousel"
+                                 style="background-color: Transparent;border: none;" data-slide="next">
+                           <span style="font-size:2.5em; align:center">&rarr;</span>
+                         </a>
+                       </div>
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                     Click (Arrows | Dots) accordingly to view the (Next | Previous) image<br>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div> <!-- Modal content -->
+            </div>
+         </div>
+         <!-- Tidal Findings -->
+         <div class="modal fade" id="tidal-findings" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header" style="text-align:center">
+                     <h5 class="modal-title" id="exampleModalLabel">Tidal Energy stations</h5>
+                     <!-- <button type="button" class="close" data-dismiss="modal" style="padding-top:-100px">&times;</button> -->
+                  </div>
+                  <div class="modal-body" style="padding-top:5px">
+                     <img src="static/Images/Findings/Tidal/TidalPoints.jpg"
+                          style="width:100%;height:70vh;">
+                  </div>
+                  <div class="modal-footer" style="text-align:center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div style="padding-top:6px;">
+            <div style="float:left">
+               <div id="finding-map" style="width:73vh; height:55vh;"> </div> <br>
+               <div style="text-align:center">
+                  <div style="float:left">
+                     <img src="static/Images/Findings/Solar/ppv_kWh_nb.jpg_.jpg"
+                          style="width:20vh; height:23vh; cursor:pointer"
+                          data-toggle="modal"
+                          data-target="#solar-findings"> <br>Solar
+                  </div>
+                  <div style="float:right">
+                     <img src="static/Images/Findings/Tidal/TidalPoints.jpg"
+                          style="width:20vh; height:23vh; cursor:pointer"
+                          data-toggle="modal"
+                          data-target="#tidal-findings"> <br>Tidal
+                  </div>
+                  <div style="">
+                     <img src="static/Images/Findings/Geothermal/Suggested Sites for Geothermal Stations - Fredericton-page-001.jpg"
+                          style="width:20vh; height:23vh; cursor:pointer"
+                          data-toggle="modal"
+                          data-target="#geo-findings"> <br>Geothermal
+                  </div>
+               </div>
+            </div>
+            <div style="float:right; width:425px; height:80.5vh; background:#FFFFF0;"> <!-- font-family:'Times New Roman' -->
+               <div style="text-align:justify;margin:0 2.5vh"> <br>
+                  <u>Solar:-</u>
+                  The analysis shows NB has the potential in generating electricity for solar energy on an average of 1091.93 kWh/kWp
+                  <br><br>
+                  <u>Geothermal:-</u>
+                  After considering the mentioned factors for constructing a geothermal power station and overlaying the geothermal
+                  potential map, we can conclude that Fredericton and Saint John cities have the highest potential to construct a geothermal
+                  power station. Since both cities are located where the ground temperature is fairly high and covers all the required factors
+                  including Market, Accessibility and as we can see there are some drilled holes in the radius of 30 km within these cities which
+                  could be a choice for geothermal power stations. <br><br>
+                  <u>Tidal:-</u>
+                  Considering the marine life zone, the tidal height and other factors, we have attempted to find the site locations
+                  suitable for building the tidal power station and generating the tidal energy on the coastal region of New Brunswick. <br><br>
+                  ArcGIS online: <a class="link" href="http://arcg.is/WzLje" target="_blank">http://arcg.is/WzLje</a><br><br>
+                  <table class="table table-hover" style="text-align:center">
+                     <tr>
+                        <th scope="col" style="text-align:center"> Solar </th>
+                        <th scope="col" style="text-align:center"> Geothermal </th>
+                        <th scope="col" style="text-align:center"> Tidal </th>
+                     </tr>
+                     <tr>
+                        <td> <a class="link" href="https://arcg.is/0KDKKD" target="_blank">
+                              <img src="static/Images/StoryMap.png"
+                                   width=90
+                                   height=60></a> </td>
+                        <td> <a class="link" href="https://arcg.is/0yG8uK" target="_blank">
+                              <img src="static/Images/StoryMap.png"
+                                   width=90
+                                   height=60></a> </td>
+                        <td> <a class="link" href="https://arcg.is/avC5z" target="_blank">
+                              <img src="static/Images/StoryMap.png"
+                                   width=90
+                                   height=60></a> </td>
+                     </tr>
+                     <tr>
+                        <td> <a class="link" href="static/KMZ/Findings/Sites_Solar.kmz" download>
+                           <img src="static/Images/kml.png" width=50 height=65></a> </td>
+                        <td> <a class="link" href="static/KMZ/Findings/Sites_Geothermal.kmz" download>
+                           <img src="static/Images/kml.png" width=50 height=65></a> </td>
+                        <td> <a class="link" href="static/KMZ/Findings/Sites_Tidal.kmz" download>
+                           <img src="static/Images/kml.png" width=50 height=65></a> </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Javascript -->
+   <script>
+      function AddTitle(omap, title, color){
+         var Title = L.control();
+         Title.onAdd = function (omap) {
+            this.mydiv = L.DomUtil.create('div', 'info');
+            this.mydiv.innerHTML += '<h4 style="color:'+color+'">'+title+'</h4>';
+            return this.mydiv;
+         };
+         Title.addTo(omap);
+      }
+      Contents = ['#AHome', '#ADatasets', '#AAnalysis', '#AFindings', '#ATeam'];
+      function Home(){
+         $('#Content').html($('#Home').html());
+         $('#Content').removeAttr('style');
+         $('#header-image').show();
+         $('#Content').css({"text-align":"justify", "padding-top":"10px"});
+         for(var i of Contents){$(i).removeClass('active')};
+         $('#AHome').addClass('active');
+         // Study Area Map
+         var map = L.map('study-area').setView([46.5, -66.7], 6);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '' //&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+         }).addTo(map);
+         L.easyButton('<span style="font-size:1.5em">&curren;</span>', function(){
+            map.setView([46.5, -66.7], 6);
+         }).addTo(map);
+         L.control.scale().addTo(map);
+         L.control.mousePosition().addTo(map);
+         AddTitle(map, "Study Area", "black");
+         L.geoJson(nb).addTo(map);
+         // Population Trend map
+         var pchart = {
+            x: [1996, 2001, 2006, 2011, 2016],
+            y: [738133, 729498, 729997, 751171, 753871],
+            mode: 'line',
+            text: [],
+            marker: { size: 5 }
+         };
+         var data = [ pchart ];
+         var layout = {
+            title: "<b>Population - 1996 to 2016</b>",
+            showlegend: false,
+            xaxis: {title: "Year"},
+            yaxis: {title: "Population"},
+            width: 383,
+            height: 310,
+            paper_bgcolor: "#F5F2F2",
+            plot_bgcolor: "#F5F2F2" //#FFF3
+         };
+         Plotly.newPlot('population-chart', data, layout, {displayModeBar: false});
+         // Energy Trend map
+         var echart = {
+            x: [1996, 2001, 2006, 2011, 2016],
+            y: [1, 2, 3, 4, 5],
+            mode: 'line',
+            text: [],
+            marker: { size: 5 }
+         };
+         var data = [ echart ];
+         var layout = {
+            title: "<b>Energy consumption<b>",
+            showlegend: false,
+            xaxis: {title: "Year"},
+            yaxis: {title: "Consumed energy"},
+            width: 383,
+            height: 300,
+            paper_bgcolor: "#F5EFEE",
+            plot_bgcolor: "#F5EFEE  "
+         };
+         //Plotly.newPlot('energy-chart', data, layout, {displayModeBar: false});
+      }
+      function Team(){
+         $('#Content').html($('#Team').html());
+         $('#header-image').show();
+         $('#Content').removeAttr('style');
+         //$('#Content').css({"padding-left":"320px"});
+         for(var i of Contents){$(i).removeClass('active')};
+         $('#ATeam').addClass('active');
+      }
+      function Datasets(){
+         $('#Content').html($('#Datasets').html());
+         $('#Content').removeAttr('style');
+         $('#header-image').show();
+         //$('#Content').css({"margin":"3px"});
+         for(var i of Contents){$(i).removeClass('active')};
+         $('#ADatasets').addClass('active');
+      }
+      function Analysis(){
+         $('#header-image').hide();
+         $('#Content').removeAttr('style');
+         $('#Content').html($('#Analysis').html());
+         for(var i of Contents){$(i).removeClass('active')};
+         $('#AAnalysis').addClass('active');
+
+         // Solar Map
+         var smap = L.map('solar-map').setView([46.3, -66.6], 7);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '' //&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+         }).addTo(smap);
+         // Full-Extent
+         L.easyButton('<span style="font-size:1.5em">&curren;</span>', function(){
+            smap.setView([46.3, -66.6], 7);
+         }).addTo(smap);
+         L.control.scale().addTo(smap);
+         AddTitle(smap, "Photovoltaic Potential Map", "black");
+         L.control.mousePosition().addTo(smap);
+         $('#collapse1').on('shown.bs.collapse', function(){
+            setTimeout(function() {
+               smap.invalidateSize();
+            }, 1);
+         });
+         L.geoJSON(solar, {
+            style: function(){return {color:"#ff7800"}},
+            onEachFeature: function(feature, layer){
+               var content = ""
+               content += "<b>Id: </b>" + feature.properties.DIST_ID + "<br>"
+               content += "<b>Name: </b>" + feature.properties.PED_Name_E + "<br>"
+               content += "<b>Area: </b>" + feature.properties.Shape_Area + "<br>"
+               content += "<b>PV Kwh/kWp: </b>" + feature.properties["PV Kwh/kWp"] + "<br>"
+               layer.bindPopup(content);
+               layer.on('mouseover', function(f) {
+                  //layer.openPopup();
+                  f.target.setStyle({color:"#0000FF"})
+               });
+               layer.on('mouseout', function(f) {
+                  //layer.closePopup();
+                  f.target.setStyle({color: "#ff7800"})
+               });
+         }}).addTo(smap);
+
+         // Geothermal Map
+         var gmap = L.map('geothermal-map').setView([46.35, -65.9], 7);
+         var BING_KEY = 'AuhiCJHlGzhg93IqUH_oCpl_-ZUrIE6SPftlyGYUvr9Amx5nzA-WqGcPquyFZl4L';
+         L.tileLayer.bing(BING_KEY).addTo(gmap);
+         // Full-Extent
+         L.easyButton('<span style="font-size:1.5em">&curren;</span>', function(){
+            gmap.setView([46.35, -65.9], 7);
+         }).addTo(gmap);
+         L.control.scale().addTo(gmap);
+         AddTitle(gmap, "Geothermal Map", "white");
+         L.control.mousePosition().addTo(gmap);
+         $('#collapse2').on('shown.bs.collapse', function(){
+            setTimeout(function() {
+               gmap.invalidateSize();
+            }, 1);
+         });
+         L.geoJSON(geothermal, {
+            style: function(f){
+               return {
+                  fillColor: f.properties.HTML_Color,
+                  color: f.properties.HTML_Color,
+                  fillOpacity: 0.9,
+               }
+            },
+            onEachFeature: function(feature, layer){
+               var content = ""
+               content += "<b>Potential-Level: </b>" + feature.properties.Pot_Level + "<br>"
+               content += "<b>Temperature: </b>" + feature.properties.Temp + "°C<br>"
+               layer.bindPopup(content);
+         }}).addTo(gmap);
+         // Legend
+         var legend = L.control({position: "bottomright"});
+         legend.onAdd = function(gmap){
+            this.mydiv = L.DomUtil.create('div', 'info legend');
+            this.mydiv.innerHTML += '<b>Legend<br>Temp at 7km</b><br>'
+            for(i=0; i<11; i++){
+               clr = geothermal.features[i].properties.HTML_Color;
+               temp = geothermal.features[i].properties.Temp;
+               this.mydiv.innerHTML += '<i style="background:'+clr+'"></i>'+temp+'°C<br>';
+            }
+            return this.mydiv;
+         };
+         legend.addTo(gmap);
+         // L.geoJSON(city_buffer).addTo(gmap);
+         L.geoJSON(Cities, {
+            pointToLayer: function (feature, latlng) {
+               return L.circleMarker(latlng, {radius:3, color:"blue", fillColor:"blue"})
+            },
+            onEachFeature: function(feature, layer){
+               var content = "<b>Name: </b>" + feature.properties.NAME
+               layer.bindTooltip(content);
+            }
+         }).addTo(gmap);
+         //Tidal charts
+         var chart_2017 = {
+            x: x_2017,
+            y: y_2017,
+            mode: 'markers',
+            type: 'scatter',
+            name: '2017',
+            text: l_2017,
+            marker: { size: 5 }
+         };
+         var chart_2018 = {
+            x: x_2018,
+            y: y_2018,
+            mode: 'markers',
+            type: 'scatter',
+            name: '2018',
+            text: l_2018,
+            marker: { size: 5 }
+         };
+         var chart_2019 = {
+            x: x_2019,
+            y: y_2019,
+            mode: 'markers',
+            type: 'scatter',
+            name: '2019',
+            text: l_2019,
+            marker: { size: 5 }
+         };
+         var data = [ chart_2017, chart_2018, chart_2019 ];
+         var layout = {
+            title: "St. John Harbour's Tidal Heights - 2017 to 2019",
+            showlegend: true,
+            xaxis: {title: "Observations"},
+            yaxis: {title: "Height (m)"},
+            width: 700,
+            height: 380
+         };
+         Plotly.newPlot('tidal-chart', data, layout, {displayModeBar: true});
+         // Tidal Map
+         var tmap = L.map('tidal-map').setView([46.277, -66.35], 6.3);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '' //&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+         }).addTo(tmap);
+         // Full-Extent
+         L.easyButton('<span style="font-size:1.5em">&curren;</span>', function(){
+            tmap.setView([46.277, -66.3], 6.3);
+         }).addTo(tmap);
+         L.control.scale().addTo(tmap);
+         AddTitle(tmap, "Coastal Map with Observatories", "black");
+         L.control.mousePosition().addTo(tmap);
+         $('#collapse3').on('shown.bs.collapse', function(){
+            setTimeout(function() {
+               tmap.invalidateSize();
+            }, 1);
+         });
+         L.geoJSON(Coastline).addTo(tmap);
+         L.geoJSON(Observatories, {
+               pointToLayer: function (feature, latlng) {
+                  return L.circleMarker(latlng, {radius:3, color:"orange", fillColor:"orange"})
+               },
+               onEachFeature: function(feature, layer){
+                  var content = ""
+                  content += "<b>Name: </b>" + feature.properties.Sites + "<br>"
+                  content += "<b>Min: </b>" + feature.properties.Min + "<br>"
+                  content += "<b>Max: </b>" + feature.properties.Max + "<br>"
+                  content += "<b>Stdev: </b>" + feature.properties.SD + "<br>"
+                  layer.bindPopup(content);
+               }
+         }).addTo(tmap);
+         L.geoJSON(tidal_buffers, {
+            style: function(f){
+               return {color: "red"}
+            },
+            onEachFeature: function(feature, layer){
+               content = "<b>Name: </b>" + feature.properties.Site_Name
+               layer.bindPopup(content);
+            }
+         }).addTo(tmap);
+      }
+      function Findings(){
+         $('#Content').html($('#Findings').html());
+         $('#header-image').hide();
+         $('#Content').removeAttr('style');
+         for(var i of Contents){$(i).removeClass('active')};
+         $('#AFindings').addClass('active');
+         // Map
+         var map = L.map('finding-map').setView([46.39, -66.46], 7);
+         L.geoJson(nb, {style:{color:"red"}}).addTo(map);
+         // Icons
+         var SIcon = L.icon({
+               iconUrl: "static/Images/Findings/Solar.png",
+               iconSize: [20, 20]
+               });
+         var GIcon = L.icon({
+               iconUrl: "static/Images/Findings/Geothermal.png",
+               iconSize: [20, 20]
+               });
+         var TIcon = L.icon({
+               iconUrl: "static/Images/Findings/Tidal.png",
+               iconSize: [30, 30]
+               });
+         // Solar
+         var L_Solar = L.geoJSON(solar, {
+            style: function(){
+               return {color:"#ff7800"}
+            },
+            onEachFeature: function(feature, layer){
+               var content = ""
+               content += "<b>Id: </b>" + feature.properties.DIST_ID + "<br>"
+               content += "<b>Name: </b>" + feature.properties.PED_Name_E + "<br>"
+               content += "<b>Area: </b>" + feature.properties.Shape_Area + "<br>"
+               content += "<b>PV Kwh/kWp: </b>" + feature.properties["PV Kwh/kWp"] + "<br>"
+               layer.bindPopup(content);
+            }
+         });
+         // Solar potential sites
+         for(p of Sloc.features){
+            x = p.geometry.coordinates[0]
+            y = p.geometry.coordinates[1]
+            c = "<b>Name:</b> " + p.properties.Name
+            L.marker([y,x], {icon:SIcon}).bindPopup(c).addTo(map);
+         }
+         //Geothermal
+         var L_Geothermal = L.geoJSON(geothermal, {
+                  style: function(f){
+                     return {
+                        fillColor: f.properties.HTML_Color,
+                        color: f.properties.HTML_Color,
+                        fillOpacity: 0.9,
+                     }
+                  }
+         });
+         var L_Cities = L.geoJSON(Cities, {
+            pointToLayer: function (feature, latlng) {
+               return L.circleMarker(latlng, {radius:3, color:"blue", fillColor:"blue"})
+            },
+            onEachFeature: function(feature, layer){
+               var content = "<b>Name: </b>" + feature.properties.NAME
+               layer.bindPopup(content);
+            }
+         });
+         // var L_Freeways = L.geoJSON(Freeways, {style:function(){return {color:"red", weight:1}}});
+         // var L_Arterial = L.geoJSON(Arterial, {style:function(){return {color:"red", weight:1}}});
+         // var L_Express = L.geoJSON(Express, {style:function(){return {color:"red", weight:1}}});
+         // var L_Collector = L.geoJSON(Collector, {style:function(){return {color:"red", weight:1}}});
+         var L_DrillHoles = L.geoJSON(Drillholes_300, {
+            pointToLayer: function (feature, latlng) {
+               return L.circleMarker(latlng, {radius:3, color:"black", fillColor:"black"})
+            },
+            onEachFeature: function(feature, layer){
+               var content = ""
+               content += "<b>Digged Length: </b>" + feature.properties.LENGTH_M + "m<br>"
+               content += "<b>Surface rock: </b>" + feature.properties.SURFACEROC + "<br>"
+               layer.bindPopup(content);
+            }
+         });
+         // Geothermal potential sites
+         for(p of FGloc.features){
+            x = p.geometry.coordinates[0]
+            y = p.geometry.coordinates[1]
+            c = "<b>Surface Rock:</b> " + p.properties.SURFACEROC + "<br><b>Length drilled:</b> " + p.properties.LENGTH_M
+            L.marker([y,x], {icon:GIcon}).bindPopup(c).addTo(map);
+         }
+         for(p of SGloc.features){
+            x = p.geometry.coordinates[0]
+            y = p.geometry.coordinates[1]
+            c = "<b>Surface Rock:</b> " + p.properties.SURFACEROC + "<br><b>Length drilled:</b> " + p.properties.LENGTH_M
+            L.marker([y,x], {icon:GIcon}).bindPopup(c).addTo(map);
+         }
+         // Tidal
+         var L_Coastal = L.geoJSON(Coastline);
+         var L_Observatory = L.geoJSON(Observatories, {
+               pointToLayer: function (feature, latlng) {
+                  return L.circleMarker(latlng, {radius:3, color:"orange", fillColor:"orange"})
+               },
+               onEachFeature: function(feature, layer){
+                  var content = ""
+                  content += "<b>Name: </b>" + feature.properties.Sites + "<br>"
+                  content += "<b>Min: </b>" + feature.properties.Min + "<br>"
+                  content += "<b>Max: </b>" + feature.properties.Max + "<br>"
+                  content += "<b>Stdev: </b>" + feature.properties.SD + "<br>"
+                  layer.bindPopup(content);
+               }
+         })
+         var L_MarineLife = L.geoJSON(tidal_buffers, {
+            style: function(f){
+               return {color: "red"}
+            },
+            onEachFeature: function(feature, layer){
+               layer.bindPopup("Whale Ecozone");
+            }
+         })
+         for(p of Tloc.features){
+            x = p.geometry.coordinates[0]
+            y = p.geometry.coordinates[1]
+            c = "<b>Name:</b> " + p.properties.Sites
+            L.marker([y,x], {icon:TIcon}).bindPopup(c).addTo(map);
+         }
+         // Open street Map
+         OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+               attribution: '' //&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+         })
+         //Bing
+         var BING_KEY = 'AuhiCJHlGzhg93IqUH_oCpl_-ZUrIE6SPftlyGYUvr9Amx5nzA-WqGcPquyFZl4L';
+         Bing = L.tileLayer.bing(BING_KEY).addTo(map);
+         // Full-Extent
+         L.easyButton('<span style="font-size:1.5em">&curren;</span>', function(){
+            map.setView([46.39, -66.46], 7);
+         }).addTo(map);
+         L.control.scale().addTo(map);
+         AddTitle(map, "Findings map", "red");
+         L.control.mousePosition().addTo(map);
+
+         var GroupedLayers = {
+            "<u>Solar</u>": {
+               "Photovoltaic-map": L_Solar,
+            },
+            "<u>Geothermal</u>":{
+               "Temerature": L_Geothermal,
+               // "Cities": L_Cities,
+               // "Arterial": L_Arterial,
+               // "Collector": L_Collector,
+               // "Express": L_Express,
+               // "Freeways": L_Freeways,
+               // "Drillholes": L_DrillHoles
+            },
+            "<u>Tidal</u>":{
+               "Coastal" : L_Coastal,
+               "Observatories": L_Observatory,
+               "Marine Life": L_MarineLife
+            }
+         }
+         L.control.groupedLayers(
+            {"OSM": OSM, "Satellite": Bing},
+            GroupedLayers,
+            {position: 'topleft', size:10}
+         ).addTo(map);
+         // Legend Findings page
+         var legend = L.control({position: "bottomright"});
+         legend.onAdd = function(gmap){
+            this.mydiv = L.DomUtil.create('div', 'info f_legend');
+            this.mydiv.innerHTML += '<b>Legend (sites-count)<br>'
+            this.mydiv.innerHTML += '<img src="static/Images/Findings/Solar.png" width=32 height=35> Solar(<b>11</b>)<br>';
+            this.mydiv.innerHTML += '<img src="static/Images/Findings/Geothermal.png" width=32 height=30> Geothermal(<b>17</b>)<br>';
+            this.mydiv.innerHTML += '<img src="static/Images/Findings/Tidal.png" width=30 height=30> Tidal (<b>9</b>)<br>';
+            return this.mydiv;
+         };
+         legend.addTo(map);
+      }
+      $(function(){Home()});
+      </script>
+</body>
+</html>
